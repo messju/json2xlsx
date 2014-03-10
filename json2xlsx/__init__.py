@@ -38,17 +38,16 @@ def write(filename, data):
     cell_formats = {}
 
     for ws_data in data['worksheets']:
+        ws = wb.add_worksheet(ws_data['sheetname'])
 
-        ws = wb.add_worksheet(ws_data['name'])
         if 'columns' in ws_data:
             for column in ws_data['columns']:
-                print repr(column)
                 ws.set_column(column['x'], column['x'], column['width'])
-            
+
         if 'rows' in ws_data:
             for row in ws_data['rows']:
                 ws.set_row(column['y'], column['height'])
-            
+
         if 'cells' in ws_data:
             for cell in ws_data['cells']:
 
@@ -66,6 +65,12 @@ def write(filename, data):
 
                 ws.write(cell['y'], cell['x'], cell['value'], cell_format)
 
+        if 'freeze_panes' in ws_data:
+            for pane in ws_data['freeze_panes']:
+                row = pane['row']
+                col = pane['col']
+                ws.freeze_panes(row, col)
+
     wb.close()
     return True
 
@@ -78,11 +83,11 @@ class TestWriteXLSXFile(unittest.TestCase):
 
     def test_write_xlsx_file(self):
         """Test writing an XLXS File."""
-        
+
         test_data = {
             'worksheets': [
                 {
-                    'name': 'sheet1',
+                    'sheetname': 'sheet1',
                     'cells': [
                         {'x': 0, 'y': 0, 'value': 12},
                         {'x': 1, 'y': 0, 'value': 12},
@@ -108,10 +113,8 @@ class TestWriteXLSXFile(unittest.TestCase):
 
         self.assertRaises(TypeError, resolve_format, False)
 
-    
+
 
 
 if __name__ == '__main__':
     unittest.main()
-
-
